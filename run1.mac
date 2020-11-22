@@ -1,0 +1,9 @@
+# ==== Default macro for mu-raquette ====
+
+# Set verbose
+/control/verbose 0
+/run/verbose 0
+/vis/verbose errors
+/tracking/verbose 0
+
+/run/beamOn 600000

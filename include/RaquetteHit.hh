@@ -26,6 +26,7 @@ class RaquetteHit : public G4VHit {
     void SetName     (G4String name)     { _name = name; };
     void SetVertex   (G4ThreeVector vert){ _vertex = vert; };
     void SetLength   (G4double len)      { _length = len; };
+    void SetIsPrimary(G4bool prim)       { _isPrimary = prim; };
 
     // Getters
     G4int         GetTrackID  () { return _trackId; };
@@ -34,6 +35,7 @@ class RaquetteHit : public G4VHit {
     G4String      GetName     () { return _name; };
     G4ThreeVector GetVertex   () { return _vertex; };
     G4double      GetLength   () { return _length; };
+    G4bool        GetIsPrimary() { return _isPrimary; };
 
   private:
     G4int         _trackId;    // Id of the track
@@ -42,6 +44,7 @@ class RaquetteHit : public G4VHit {
     G4String      _name;       // Particle Name
     G4ThreeVector _vertex;     // Vertex de creation de la particle
     G4double      _length;     // Longeur de la trace
+    G4bool        _isPrimary;
 };
 
 typedef G4THitsCollection<RaquetteHit> HitsCollection;

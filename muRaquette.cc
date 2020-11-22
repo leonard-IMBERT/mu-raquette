@@ -2,7 +2,7 @@
 
 // Enable multi-threading
 // == Run Manager
-#ifdef G4MULTITHREAD
+#ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
 #else
 #include "G4RunManager.hh"
@@ -24,7 +24,10 @@
 #include "PrimaryGeneratorAction.hh"
 // Import analysis
 #include "EventAction.hh"
+// Import root utils
+#include "RootData.hh"
 
+RootData * rootFile;
 
 int main(int argc, char** argv) {
 
@@ -36,6 +39,9 @@ int main(int argc, char** argv) {
 
   // == Construct the run manager
   G4RunManager * runManager = new G4RunManager;
+
+  rootFile = new RootData();
+  rootFile->Create();
 
   // == Build the detector
   G4VUserDetectorConstruction * detector = new DetectorConstruction;
@@ -80,7 +86,9 @@ int main(int argc, char** argv) {
   }
 
   // On quit, cleanup
+  rootFile->EndOfAction();
   delete runManager;
+  delete rootFile;
 
   return 0;
 }

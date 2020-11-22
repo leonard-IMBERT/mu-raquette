@@ -33,6 +33,7 @@ G4bool SensitiveDetector::ProcessHits(G4Step * aStep, G4TouchableHistory * ) {
   newHit->SetName     (aStep->GetTrack()->GetParticleDefinition()->GetParticleName());
   newHit->SetVertex   (aStep->GetTrack()->GetVertexPosition());
   newHit->SetLength   (aStep->GetTrack()->GetTrackLength());
+  newHit->SetIsPrimary(aStep->GetTrack()->GetParentID() == 0);
 
   _hitsCollection->insert(newHit);
 

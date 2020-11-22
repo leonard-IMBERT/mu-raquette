@@ -32,6 +32,10 @@ include_directories(${PROJECT_SOURCE_DIR}/include
 
 message(${ROOT_INCLUDE_DIRS})
 
+# Setup multi threading
+
+set(G4MULTITHREADED ON)
+
 # -----------------------------------------------------------------------------
 # Locate sources and headers
 

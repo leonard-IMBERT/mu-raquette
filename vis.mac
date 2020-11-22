@@ -1,10 +1,10 @@
 # ==== Default macro for mu-raquette ====
 
 # Set verbose
-/control/verbose 2
-/run/verbose 2
+/control/verbose 0
+/run/verbose 0
 /vis/verbose errors
-/tracking/verbose 2
+/tracking/verbose 1
 
 # Create and empty scene
 /vis/open OGL 600x600-0+0

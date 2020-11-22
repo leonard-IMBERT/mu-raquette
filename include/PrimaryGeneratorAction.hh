@@ -5,6 +5,20 @@
 #include "G4ParticleGun.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
 
+#include "TH1.h"
+#include "TH2.h"
+#include "TProfile.h"
+#include "TNtuple.h"
+#include "TRandom.h"
+#include "TStyle.h"
+#include "TROOT.h"
+#include "TApplication.h"
+#include "TSystem.h"
+#include "TH1.h"
+#include "TPad.h"
+#include "TCanvas.h"
+#include "TFile.h"
+
 class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   public:
     PrimaryGeneratorAction(G4int nparts = 1);
@@ -15,6 +29,8 @@ class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   private:
     G4ParticleGun * particleGun;
     G4int _nparts;
+    TFile * run;
+    TFile * gammaSpec;
 };
 
 #endif
