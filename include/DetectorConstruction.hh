@@ -20,11 +20,16 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
   private:
     // == Logicals volumes ==
     G4LogicalVolume * experimentalHall_log;
-    G4LogicalVolume * raquette_log;
+    G4LogicalVolume * rs_log;
+    G4LogicalVolume * r2_log;
 
     // == Physicals volumes ==
     G4VPhysicalVolume * experimentalHall_phys;
-    G4VPhysicalVolume * raquette_phys;
+    G4VPhysicalVolume * r1s1_phys;
+    G4VPhysicalVolume * r1s2_phys;
+    G4VPhysicalVolume * r2_phys;
+    G4VPhysicalVolume * r3s1_phys;
+    G4VPhysicalVolume * r3s2_phys;
 };
 
 #endif

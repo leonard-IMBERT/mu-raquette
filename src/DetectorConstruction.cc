@@ -14,8 +14,9 @@
 G4String DetectorConstruction::RaquetteCollectionName = "RaquetteHitsCollection";
 
 DetectorConstruction::DetectorConstruction() :
-  experimentalHall_log(0), raquette_log(0),
-  experimentalHall_phys(0), raquette_phys(0) {;}
+  experimentalHall_log(0), rs_log(0), r2_log(0),
+  experimentalHall_phys(0),
+  r1s1_phys(0), r1s2_phys(0), r2_phys(0), r3s1_phys(0), r3s2_phys(0) {;}
 
 DetectorConstruction::~DetectorConstruction() {}
 
@@ -56,24 +57,44 @@ G4VPhysicalVolume * DetectorConstruction::Construct() {
 
   // === Raquette
   // Z -> height axis
-  G4double raquette_z = 2.5*cm;
-  G4double raquette_x = 25*cm;
-  G4double raquette_y = 25*cm;
+  // ======== Raquette 1
+  // =========== Square 1
+  G4double rs_z = (3./2.)*cm;
+  G4double rs_x = (47.5/2.)*cm;
+  G4double rs_y = (49./2.)*cm;
+  G4double r2_z = 2.5*cm;
+  G4double r2_x = 13.1*cm;
+  G4double r2_y = 74.8*cm;
 
-  G4Box * raquette_box = new G4Box("raquette", raquette_x, raquette_y, raquette_z);
-  raquette_log         = new G4LogicalVolume(raquette_box, Detect, "raquette_log");
-  raquette_phys        = new G4PVPlacement(0, G4ThreeVector(), raquette_log, "raquette", experimentalHall_log, false, 0);
+  G4Box * rs_box   = new G4Box("rs", rs_x, rs_y, rs_z);
+  rs_log           = new G4LogicalVolume(rs_box, Detect, "rs_log");
+  r1s1_phys        = new G4PVPlacement(0, G4ThreeVector(0, rs_y, -rs_z - r2_z), rs_log, "r1s1", experimentalHall_log, false, 0);
+
+  // =========== Square 2
+  r1s2_phys        = new G4PVPlacement(0, G4ThreeVector(0, -rs_y, -rs_z - r2_z), rs_log, "r1s2", experimentalHall_log, false, 1);
+
+  // ======== Raquette 2
+  G4Box * r2_box   = new G4Box("r2", r2_x, r2_y, r2_z);
+  r2_log           = new G4LogicalVolume(r2_box, Detect, "r2_log");
+  r2_phys          = new G4PVPlacement(0, G4ThreeVector(0, 0, 0), r2_log, "r2", experimentalHall_log, false, 0);
+
+  // ======== Raquette 3
+  // =========== Square 1
+  r3s1_phys        = new G4PVPlacement(0, G4ThreeVector(0, rs_y, +rs_z + r2_z), rs_log, "r3s1", experimentalHall_log, false, 2);
+  // =========== Square 2
+  r3s2_phys        = new G4PVPlacement(0, G4ThreeVector(0, -rs_y, +rs_z + r2_z), rs_log, "r3s2", experimentalHall_log, false, 3);
 
   // ====== Sensible volume ======
   G4String sensitiveName = "RaquetteSD";
   SensitiveDetector * sd = new SensitiveDetector(sensitiveName, RaquetteCollectionName);
   G4SDManager::GetSDMpointer()->AddNewDetector(sd);
-  raquette_log->SetSensitiveDetector(sd);
+  rs_log->SetSensitiveDetector(sd);
 
   // ====== Vis attributes ======
   
   experimentalHall_log->SetVisAttributes(new G4VisAttributes(false));
-  raquette_log        ->SetVisAttributes(new G4VisAttributes(G4Colour(0., 1., 1.)));
+  rs_log              ->SetVisAttributes(new G4VisAttributes(G4Colour(0., 1., 1.)));
+  r2_log              ->SetVisAttributes(new G4VisAttributes(G4Colour(0., 1., 0.5)));
 
   return experimentalHall_phys;
 }
