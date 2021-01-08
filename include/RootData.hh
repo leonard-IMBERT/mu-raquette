@@ -4,6 +4,8 @@
 #include "G4String.hh"
 #include "G4Types.hh"
 
+#include "Detect.hh"
+
 #include "TFile.h"
 #include "TH1D.h"
 #include "TTree.h"
@@ -18,33 +20,31 @@ class RootData {
     void EndOfAction();
     void FillTree();
 
-    TTree * GetTree() const { return tree; };
     TFile * GetFileRoot() const { return hfile; };
 
     // Getter and setter
     G4double  GetMuEDep() const { return MuEDep; };
     void      SetMuEDep(G4double val) { MuEDep = val; };
 
-    G4double  GetGEDep() const { return GEDep; };
-    void      SetGEDep(G4double val) { GEDep = val; };
+    G4String GetProcName() const { return procName; };
+    void     SetProcName(G4String name) { procName = name; };
 
-    G4double  GetTotEDep() const { return TotEDep; };
-    void      SetTotEDep(G4double val) { TotEDep = val; };
+    Detect GetDetecteur() const { return detect; };
+    void   SetDetecteur(Detect de) { detect = de; };
 
     static const G4String UserOutputFile;
 
 
   private:
     TFile * hfile;
-    TTree * tree;
-
-    TH1D * Mu;
-    TH1D * Gamma;
-    TH1D * Total;
+    TH1D * EDepByDes;
+    TH1D * EMuDetecteur;
+    TH1D * EMuVetoA;
+    TH1D * EMuVetoB;
 
     G4double MuEDep;
-    G4double GEDep;
-    G4double TotEDep;
+    G4String procName;
+    Detect detect;
 };
 
 #endif

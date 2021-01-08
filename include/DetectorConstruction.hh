@@ -16,12 +16,15 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
     G4VPhysicalVolume * Construct();
 
     static G4String RaquetteCollectionName;
+    static G4String VetoACollectionName;
+    static G4String VetoBCollectionName;
 
   private:
     // == Logicals volumes ==
     G4LogicalVolume * experimentalHall_log;
-    G4LogicalVolume * rs_log;
+    G4LogicalVolume * rs1_log;
     G4LogicalVolume * r2_log;
+    G4LogicalVolume * rs3_log;
 
     // == Physicals volumes ==
     G4VPhysicalVolume * experimentalHall_phys;

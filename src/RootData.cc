@@ -22,12 +22,10 @@ const G4String RootData::UserOutputFile = "Results.root";
 
 RootData::RootData() {
   hfile = (TFile *)0;
-  tree = (TTree *)0;
 
   MuEDep = 0.;
-  GEDep = 0.;
-  TotEDep = 0.;
-
+  procName = "";
+  detect = Detect::vetoA;
 }
 
 RootData::~RootData() {}
@@ -35,21 +33,17 @@ RootData::~RootData() {}
 
 void RootData::Create() {
   hfile = new TFile("Results.root"/*RootData::UserOutputFile*/, "RECREATE", "ROOT file with histograms");
-  Mu = new TH1D("HMuEDep", "Énergie déposée par les muons;Nombre d'evenements;Énergie (MeV)", 300, 0, 65);
-  Gamma = new TH1D("HGEDep", "Énergie déposée par les gamma;Nombre d'evenements;Énergie (MeV)", 300, 0, 65);
-  Total = new TH1D("HTotEDep", "Énergie déposée par les gamma;Nombre d'evenements;Énergie (MeV)", 300, 0, 65);
-  tree = new TTree("SourceTree","MuAnalysis");
-
-  tree->Branch("MuEDep", &MuEDep, "MuEDep/D");
-  tree->Branch("GEDep", &GEDep, "GEDep/D");
-  tree->Branch("TotEDep", &TotEDep, "TotEDep/D");
+  EDepByDes =  new TH1D("EDepByDes", "Energie deposee lors de desintegration;Energie (MeV);Nombre d'evenements", 300, 0, 30);
+  EMuDetecteur = new TH1D("EMuDetecteur", "Energie deposee par les muons dans le detecteur;Energie (MeV);Nombre d'evenements", 300, 0, 65);
+  EMuVetoA = new TH1D("EMuVetoA", "Energie deposee par les muons dans le veto A;Energie (MeV);Nombre d'evenements", 300, 0, 65);
+  EMuVetoB = new TH1D("EMuVetoB", "Energie deposee par les muons dans le veto B;Energie (MeV);Nombre d'evenements", 300, 0, 65);
 }
 
 void RootData::FillTree() {
-  if(MuEDep > 0) { Mu->Fill(MuEDep); }
-  if(GEDep > 0) { Gamma->Fill(GEDep); }
-  if(TotEDep > 0) { Total->Fill(TotEDep); }
-  tree->Fill();
+  if(MuEDep > 0 && detect == Detect::vetoA) { EMuVetoA->Fill(MuEDep); };
+  if(MuEDep > 0 && detect == Detect::vetoB) { EMuVetoB->Fill(MuEDep); };
+  if(MuEDep > 0 && detect == Detect::detecteur) { EMuDetecteur->Fill(MuEDep); };
+  if(MuEDep > 0 && detect == Detect::detecteur && procName == "Decay") { EDepByDes->Fill(MuEDep); };
 }
 
 void RootData::EndOfAction() {

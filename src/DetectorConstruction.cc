@@ -1,5 +1,6 @@
 #include "DetectorConstruction.hh"
 #include "SensitiveDetector.hh"
+#include "SensitiveVeto.hh"
 
 #include "G4Box.hh"
 #include "G4Colour.hh"
@@ -12,9 +13,11 @@
 #include "G4VisAttributes.hh"
 
 G4String DetectorConstruction::RaquetteCollectionName = "RaquetteHitsCollection";
+G4String DetectorConstruction::VetoACollectionName = "VetoAHitsCollection";
+G4String DetectorConstruction::VetoBCollectionName = "VetoBHitsCollection";
 
 DetectorConstruction::DetectorConstruction() :
-  experimentalHall_log(0), rs_log(0), r2_log(0),
+  experimentalHall_log(0), rs1_log(0), r2_log(0), rs3_log(0),
   experimentalHall_phys(0),
   r1s1_phys(0), r1s2_phys(0), r2_phys(0), r3s1_phys(0), r3s2_phys(0) {;}
 
@@ -32,7 +35,7 @@ G4VPhysicalVolume * DetectorConstruction::Construct() {
   G4Element * N = new G4Element("Nitrogen", "N", z=7., a= 14.01*g/mole);
   G4Element * O = new G4Element("Oxygen"  , "O", z=8., a= 16.00*g/mole);
 
-  G4Material * Air = new G4Material("Air", density= 1.29*mg/cm3, nel=2);
+  G4Material * Air = new G4Material("Air", density= /*1.29*/0*mg/cm3, nel=2);
   Air->AddElement(N, 70*perCent);
   Air->AddElement(O, 30*perCent);
 
@@ -67,11 +70,11 @@ G4VPhysicalVolume * DetectorConstruction::Construct() {
   G4double r2_y = 74.8*cm;
 
   G4Box * rs_box   = new G4Box("rs", rs_x, rs_y, rs_z);
-  rs_log           = new G4LogicalVolume(rs_box, Detect, "rs_log");
-  r1s1_phys        = new G4PVPlacement(0, G4ThreeVector(0, rs_y, -rs_z - r2_z), rs_log, "r1s1", experimentalHall_log, false, 0);
+  rs1_log           = new G4LogicalVolume(rs_box, Detect, "rs1_log");
+  r1s1_phys        = new G4PVPlacement(0, G4ThreeVector(0, rs_y, -rs_z - r2_z), rs1_log, "r1s1", experimentalHall_log, false, 0);
 
   // =========== Square 2
-  r1s2_phys        = new G4PVPlacement(0, G4ThreeVector(0, -rs_y, -rs_z - r2_z), rs_log, "r1s2", experimentalHall_log, false, 1);
+  r1s2_phys        = new G4PVPlacement(0, G4ThreeVector(0, -rs_y, -rs_z - r2_z), rs1_log, "r1s2", experimentalHall_log, false, 1);
 
   // ======== Raquette 2
   G4Box * r2_box   = new G4Box("r2", r2_x, r2_y, r2_z);
@@ -79,22 +82,32 @@ G4VPhysicalVolume * DetectorConstruction::Construct() {
   r2_phys          = new G4PVPlacement(0, G4ThreeVector(0, 0, 0), r2_log, "r2", experimentalHall_log, false, 0);
 
   // ======== Raquette 3
+  rs3_log           = new G4LogicalVolume(rs_box, Detect, "rs3_log");
   // =========== Square 1
-  r3s1_phys        = new G4PVPlacement(0, G4ThreeVector(0, rs_y, +rs_z + r2_z), rs_log, "r3s1", experimentalHall_log, false, 2);
+  r3s1_phys        = new G4PVPlacement(0, G4ThreeVector(0, rs_y, +rs_z + r2_z), rs3_log, "r3s1", experimentalHall_log, false, 2);
   // =========== Square 2
-  r3s2_phys        = new G4PVPlacement(0, G4ThreeVector(0, -rs_y, +rs_z + r2_z), rs_log, "r3s2", experimentalHall_log, false, 3);
+  r3s2_phys        = new G4PVPlacement(0, G4ThreeVector(0, -rs_y, +rs_z + r2_z), rs3_log, "r3s2", experimentalHall_log, false, 3);
 
   // ====== Sensible volume ======
   G4String sensitiveName = "RaquetteSD";
   SensitiveDetector * sd = new SensitiveDetector(sensitiveName, RaquetteCollectionName);
+  G4String vetoAName = "VetoASD";
+  SensitiveVeto * vA = new SensitiveVeto(vetoAName, VetoACollectionName);
+  G4String vetoBName = "VetoBSD";
+  SensitiveVeto * vB = new SensitiveVeto(vetoBName, VetoBCollectionName);
   G4SDManager::GetSDMpointer()->AddNewDetector(sd);
-  rs_log->SetSensitiveDetector(sd);
+  G4SDManager::GetSDMpointer()->AddNewDetector(vA);
+  G4SDManager::GetSDMpointer()->AddNewDetector(vB);
+  rs1_log->SetSensitiveDetector(vA);
+  r2_log->SetSensitiveDetector(sd);
+  rs3_log->SetSensitiveDetector(vB);
 
   // ====== Vis attributes ======
   
   experimentalHall_log->SetVisAttributes(new G4VisAttributes(false));
-  rs_log              ->SetVisAttributes(new G4VisAttributes(G4Colour(0., 1., 1.)));
+  rs1_log             ->SetVisAttributes(new G4VisAttributes(G4Colour(0., 1., 1.)));
   r2_log              ->SetVisAttributes(new G4VisAttributes(G4Colour(0., 1., 0.5)));
+  rs3_log             ->SetVisAttributes(new G4VisAttributes(G4Colour(0., 0.5, 1.)));
 
   return experimentalHall_phys;
 }

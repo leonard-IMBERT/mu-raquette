@@ -4,6 +4,7 @@
 #include "G4THitsCollection.hh"
 #include "G4ThreeVector.hh"
 #include "G4VHit.hh"
+#include "RootData.hh"
 
 class RaquetteHit : public G4VHit {
   public:
@@ -27,6 +28,8 @@ class RaquetteHit : public G4VHit {
     void SetVertex   (G4ThreeVector vert){ _vertex = vert; };
     void SetLength   (G4double len)      { _length = len; };
     void SetIsPrimary(G4bool prim)       { _isPrimary = prim; };
+    void SetDetecteur(Detect de)         { _detecteur = de; };
+    void SetProcName (G4String procName) { _procName = procName; };
 
     // Getters
     G4int         GetTrackID  () { return _trackId; };
@@ -36,6 +39,8 @@ class RaquetteHit : public G4VHit {
     G4ThreeVector GetVertex   () { return _vertex; };
     G4double      GetLength   () { return _length; };
     G4bool        GetIsPrimary() { return _isPrimary; };
+    Detect        GetDetecteur() { return _detecteur; };
+    G4String      GetProcName () { return _procName; };
 
   private:
     G4int         _trackId;    // Id of the track
@@ -45,6 +50,8 @@ class RaquetteHit : public G4VHit {
     G4ThreeVector _vertex;     // Vertex de creation de la particle
     G4double      _length;     // Longeur de la trace
     G4bool        _isPrimary;
+    Detect        _detecteur;  // Detecteur
+    G4String      _procName;
 };
 
 typedef G4THitsCollection<RaquetteHit> HitsCollection;

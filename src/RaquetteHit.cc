@@ -5,6 +5,7 @@
 #include "G4UnitsTable.hh"
 #include "G4VVisManager.hh"
 #include "G4VisAttributes.hh"
+#include "RootData.hh"
 
 RaquetteHit::RaquetteHit():
   G4VHit(),
@@ -12,7 +13,9 @@ RaquetteHit::RaquetteHit():
   _edep(0.),
   _pos(G4ThreeVector()),
   _vertex(G4ThreeVector()),
-  _length(0.)
+  _length(0.),
+  _detecteur(Detect::other),
+  _procName("")
 {}
 
 RaquetteHit::RaquetteHit(const RaquetteHit& right)
@@ -24,6 +27,8 @@ RaquetteHit::RaquetteHit(const RaquetteHit& right)
   _name      = right._name;
   _vertex    = right._vertex;
   _length    = right._length;
+  _detecteur = right._detecteur;
+  _procName  = right._procName;
 }
 
 RaquetteHit::~RaquetteHit() {}
@@ -35,6 +40,8 @@ const RaquetteHit& RaquetteHit::operator=(const RaquetteHit& right) {
   _name      = right._name;
   _vertex    = right._vertex;
   _length    = right._length;
+  _detecteur = right._detecteur;
+  _procName  = right._procName;
 
   return *this;
 }

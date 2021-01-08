@@ -1,10 +1,10 @@
-#include "SensitiveDetector.hh"
+#include "SensitiveVeto.hh"
 
 #include "G4SDManager.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4VProcess.hh"
 
-SensitiveDetector::SensitiveDetector(const G4String& name, const G4String& hitsCollectionName):
+SensitiveVeto::SensitiveVeto(const G4String& name, const G4String& hitsCollectionName):
   G4VSensitiveDetector(name),
   desCount(0),
   _hitsCollection(NULL)
@@ -13,9 +13,9 @@ SensitiveDetector::SensitiveDetector(const G4String& name, const G4String& hitsC
   desCount = 0;
 }
 
-SensitiveDetector::~SensitiveDetector() {}
+SensitiveVeto::~SensitiveVeto() {}
 
-void SensitiveDetector::Initialize(G4HCofThisEvent * hce) {
+void SensitiveVeto::Initialize(G4HCofThisEvent * hce) {
   _hitsCollection = new HitsCollection(SensitiveDetectorName, collectionName[0]);
 
   G4int hcID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
@@ -23,19 +23,10 @@ void SensitiveDetector::Initialize(G4HCofThisEvent * hce) {
   hce->AddHitsCollection(hcID, _hitsCollection);
 }
 
-G4bool SensitiveDetector::ProcessHits(G4Step * aStep, G4TouchableHistory * ) {
+G4bool SensitiveVeto::ProcessHits(G4Step * aStep, G4TouchableHistory * ) {
   G4double edep = aStep->GetTotalEnergyDeposit();
 
   if(edep == 0.) return false; // If there is no energy deposit, ignore the step
-  G4StepPoint * prePoint = aStep->GetPostStepPoint();
-  G4String name = aStep->GetTrack()->GetParticleDefinition()->GetParticleName();
-  G4String procName = "unknow";
-  if(prePoint != NULL) {
-    procName = prePoint->GetProcessDefinedStep()->GetProcessName();
-    if(procName == "Decay" && name == "mu-") {
-      desCount += 1;
-    }
-  }
 
   RaquetteHit * newHit = new RaquetteHit;
 
@@ -47,17 +38,22 @@ G4bool SensitiveDetector::ProcessHits(G4Step * aStep, G4TouchableHistory * ) {
   newHit->SetVertex   (aStep->GetTrack()->GetVertexPosition());
   newHit->SetLength   (aStep->GetTrack()->GetTrackLength());
   newHit->SetIsPrimary(aStep->GetTrack()->GetParentID() == 0);
-  newHit->SetDetecteur(Detect::detecteur);
-  newHit->SetProcName (procName);
+  newHit->SetProcName ("unknow");
+  if(SensitiveDetectorName == "VetoASD") {
+    newHit->SetDetecteur(Detect::vetoA);
+  } else if(SensitiveDetectorName == "VetoBSD") {
+    newHit->SetDetecteur(Detect::vetoB);
+  } else {
+    newHit->SetDetecteur(Detect::other);
+  }
 
   _hitsCollection->insert(newHit);
 
   // If you want vis on the hits
   //newHit->Draw();
 
-
   return true;
 }
 
-void SensitiveDetector::EndOfEvent(G4HCofThisEvent *) {
+void SensitiveVeto::EndOfEvent(G4HCofThisEvent *) {
 }

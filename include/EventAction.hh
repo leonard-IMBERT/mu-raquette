@@ -13,8 +13,9 @@ class EventAction : public G4UserEventAction {
     void EndOfEventAction(const G4Event *);
 
   private:
-    G4int eventID;
-    G4int collidID;
+    G4int detectID;
+    G4int vetoAID;
+    G4int vetoBID;
 };
 
 #endif
