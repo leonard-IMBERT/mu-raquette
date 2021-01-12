@@ -14,6 +14,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
     ~DetectorConstruction();
 
     G4VPhysicalVolume * Construct();
+    void ConstructSDandField();
 
     static G4String RaquetteCollectionName;
     static G4String VetoACollectionName;

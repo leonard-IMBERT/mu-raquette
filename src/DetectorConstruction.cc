@@ -23,6 +23,22 @@ DetectorConstruction::DetectorConstruction() :
 
 DetectorConstruction::~DetectorConstruction() {}
 
+void DetectorConstruction::ConstructSDandField() {
+  // ====== Sensible volume ======
+  G4String sensitiveName = "RaquetteSD";
+  SensitiveDetector * sd = new SensitiveDetector(sensitiveName, RaquetteCollectionName);
+  G4String vetoAName = "VetoASD";
+  SensitiveVeto * vA = new SensitiveVeto(vetoAName, VetoACollectionName);
+  G4String vetoBName = "VetoBSD";
+  SensitiveVeto * vB = new SensitiveVeto(vetoBName, VetoBCollectionName);
+  G4SDManager::GetSDMpointer()->AddNewDetector(sd);
+  G4SDManager::GetSDMpointer()->AddNewDetector(vA);
+  G4SDManager::GetSDMpointer()->AddNewDetector(vB);
+  rs1_log->SetSensitiveDetector(vA);
+  r2_log->SetSensitiveDetector(sd);
+  rs3_log->SetSensitiveDetector(vB);
+}
+
 G4VPhysicalVolume * DetectorConstruction::Construct() {
   // ====== Materials =======
 
@@ -87,20 +103,6 @@ G4VPhysicalVolume * DetectorConstruction::Construct() {
   r3s1_phys        = new G4PVPlacement(0, G4ThreeVector(0, rs_y, +rs_z + r2_z), rs3_log, "r3s1", experimentalHall_log, false, 2);
   // =========== Square 2
   r3s2_phys        = new G4PVPlacement(0, G4ThreeVector(0, -rs_y, +rs_z + r2_z), rs3_log, "r3s2", experimentalHall_log, false, 3);
-
-  // ====== Sensible volume ======
-  G4String sensitiveName = "RaquetteSD";
-  SensitiveDetector * sd = new SensitiveDetector(sensitiveName, RaquetteCollectionName);
-  G4String vetoAName = "VetoASD";
-  SensitiveVeto * vA = new SensitiveVeto(vetoAName, VetoACollectionName);
-  G4String vetoBName = "VetoBSD";
-  SensitiveVeto * vB = new SensitiveVeto(vetoBName, VetoBCollectionName);
-  G4SDManager::GetSDMpointer()->AddNewDetector(sd);
-  G4SDManager::GetSDMpointer()->AddNewDetector(vA);
-  G4SDManager::GetSDMpointer()->AddNewDetector(vB);
-  rs1_log->SetSensitiveDetector(vA);
-  r2_log->SetSensitiveDetector(sd);
-  rs3_log->SetSensitiveDetector(vB);
 
   // ====== Vis attributes ======
   

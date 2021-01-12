@@ -6,4 +6,4 @@
 /vis/verbose errors
 /tracking/verbose 0
 
-/run/beamOn 600000
+/run/beamOn 6000000

@@ -1,10 +1,10 @@
-# ==== Default macro for mu-raquette ====
+# ==== Default vis macro for mu-raquette ====
 
 # Set verbose
 /control/verbose 0
 /run/verbose 0
 /vis/verbose errors
-/tracking/verbose 0
+/tracking/verbose 1
 
 # Create and empty scene
 /vis/open OGL 600x600-0+0
@@ -12,8 +12,9 @@
 # Draw scene
 /vis/drawVolume
 /vis/viewer/set/projection p
-/vis/viewer/set/viewpointThetaPhi 135 0 deg
+/vis/viewer/set/viewpointThetaPhi 45 90 deg
 /vis/viewer/zoom 1
+
 
 # Draw the tracks
 /vis/scene/add/trajectories smooth

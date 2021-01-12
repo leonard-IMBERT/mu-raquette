@@ -1,4 +1,5 @@
 #include "PrimaryGeneratorAction.hh"
+#include "SourceReader.hh"
 
 #include "G4Event.hh"
 #include "G4ParticleDefinition.hh"
@@ -9,18 +10,15 @@
 
 #include <cmath>
 
+extern SourceReader * source;
+
 PrimaryGeneratorAction::PrimaryGeneratorAction(G4int nparts) {
   _nparts = nparts;
   particleGun = new G4ParticleGun(_nparts);
-
-  run = new TFile("../ressources/Mu.root");
-  gammaSpec = new TFile("../ressources/GammaSpec.root");
 }
 
 PrimaryGeneratorAction::~PrimaryGeneratorAction() {
   delete particleGun;
-  delete run;
-  delete gammaSpec;
 }
 
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event * evt) {
@@ -35,11 +33,8 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event * evt) {
 
   particleGun->SetParticleDefinition(particleTable->FindParticle(particleName="mu-"));
 
-  TH1D * distE = (TH1D*)run->Get("Emu");
-  TH1D * distang = (TH1D*)run->Get("tethamu");
-
-  EMu = distE->GetRandom()*GeV;
-  //theta = distang->GetRandom();
+  EMu = source->GetRandomMuE()*GeV;
+  //theta = source->GetRandomMuTheta();
   //phi = G4UniformRand() * 2 * M_PI;
 
 

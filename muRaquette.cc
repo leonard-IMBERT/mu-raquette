@@ -2,6 +2,7 @@
 
 // Enable multi-threading
 // == Run Manager
+#define G4MULTITHREADED = 1
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
 #else
@@ -20,14 +21,15 @@
 #include "DetectorConstruction.hh"
 // Import physics
 #include "PhysicsList.hh"
-// Import big gunz
-#include "PrimaryGeneratorAction.hh"
-// Import analysis
-#include "EventAction.hh"
+// Import Init
+#include "ActionInitializer.hh"
 // Import root utils
 #include "RootData.hh"
+// Import source
+#include "SourceReader.hh"
 
 RootData * rootFile;
+SourceReader * source;
 
 int main(int argc, char** argv) {
 
@@ -37,8 +39,12 @@ int main(int argc, char** argv) {
     ui = new G4UIExecutive(argc, argv);
   }
 
+  // == Read source
+  source = new SourceReader;
+
   // == Construct the run manager
-  G4RunManager * runManager = new G4RunManager;
+  G4MTRunManager * runManager = new G4MTRunManager;
+  runManager->SetNumberOfThreads(4);
 
   rootFile = new RootData();
   rootFile->Create();
@@ -51,16 +57,12 @@ int main(int argc, char** argv) {
   G4VUserPhysicsList * physics = new PhysicsList;
   runManager->SetUserInitialization(physics);
 
-  // == Set The different actions
-  // ==== Mandatory pew pew ====
-  G4VUserPrimaryGeneratorAction * prim_action = new PrimaryGeneratorAction;
-  runManager->SetUserAction(prim_action);
+  // = Initialization =
+  G4VUserActionInitialization * init = new ActionInitializer();
 
-  // ==== Analysis ====
-  G4UserEventAction * action = new EventAction;
-  runManager->SetUserAction(action);
 
   // == Initialize the Run Manager
+  runManager->SetUserInitialization(init);
   runManager->Initialize();
 
   G4cout << "run manager setup done" << G4endl;
@@ -79,7 +81,7 @@ int main(int argc, char** argv) {
     UImanager->ApplyCommand(command + fileName);
   } else {
     // If interactive mode
-    UImanager->ApplyCommand("/control/execute vis.mac");
+    UImanager->ApplyCommand("/control/execute ./vis.mac");
     ui->SessionStart();
     // When quitting ui
     delete ui;
@@ -89,6 +91,7 @@ int main(int argc, char** argv) {
   rootFile->EndOfAction();
   delete runManager;
   delete rootFile;
+  delete source;
 
   return 0;
 }

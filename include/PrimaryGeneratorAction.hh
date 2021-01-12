@@ -29,8 +29,6 @@ class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   private:
     G4ParticleGun * particleGun;
     G4int _nparts;
-    TFile * run;
-    TFile * gammaSpec;
 };
 
 #endif

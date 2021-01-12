@@ -18,19 +18,9 @@ class RootData {
 
     void Create();
     void EndOfAction();
-    void FillTree();
+    void FillTree(G4double MuEDep, G4String procName, Detect detect);
 
     TFile * GetFileRoot() const { return hfile; };
-
-    // Getter and setter
-    G4double  GetMuEDep() const { return MuEDep; };
-    void      SetMuEDep(G4double val) { MuEDep = val; };
-
-    G4String GetProcName() const { return procName; };
-    void     SetProcName(G4String name) { procName = name; };
-
-    Detect GetDetecteur() const { return detect; };
-    void   SetDetecteur(Detect de) { detect = de; };
 
     static const G4String UserOutputFile;
 
@@ -41,10 +31,6 @@ class RootData {
     TH1D * EMuDetecteur;
     TH1D * EMuVetoA;
     TH1D * EMuVetoB;
-
-    G4double MuEDep;
-    G4String procName;
-    Detect detect;
 };
 
 #endif
