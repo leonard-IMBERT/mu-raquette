@@ -74,6 +74,7 @@ void PhysicsList::ConstructLeptons()
   // mu+/-
   G4MuonPlus::MuonPlusDefinition();
   G4MuonMinus::MuonMinusDefinition();
+  G4cout << "---------Temps de vie muon-----------> " << G4MuonMinus::MuonMinusDefinition()->GetPDGLifeTime() << G4endl;
   // nu_e
   G4NeutrinoE::NeutrinoEDefinition();
   G4AntiNeutrinoE::AntiNeutrinoEDefinition();

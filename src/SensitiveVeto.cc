@@ -39,6 +39,7 @@ G4bool SensitiveVeto::ProcessHits(G4Step * aStep, G4TouchableHistory * ) {
   newHit->SetLength   (aStep->GetTrack()->GetTrackLength());
   newHit->SetIsPrimary(aStep->GetTrack()->GetParentID() == 0);
   newHit->SetProcName ("unknow");
+  newHit->SetDeltaTime(aStep->GetTrack()->GetGlobalTime());
   if(SensitiveDetectorName == "VetoASD") {
     newHit->SetDetecteur(Detect::vetoA);
   } else if(SensitiveDetectorName == "VetoBSD") {

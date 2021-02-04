@@ -3,6 +3,7 @@
 
 #include "G4Event.hh"
 #include "G4UserEventAction.hh"
+#include "G4EventManager.hh"
 
 class EventAction : public G4UserEventAction {
   public:
@@ -16,6 +17,7 @@ class EventAction : public G4UserEventAction {
     G4int detectID;
     G4int vetoAID;
     G4int vetoBID;
+    G4EventManager * manager;
 };
 
 #endif

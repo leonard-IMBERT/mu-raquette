@@ -25,17 +25,22 @@ void SensitiveDetector::Initialize(G4HCofThisEvent * hce) {
 
 G4bool SensitiveDetector::ProcessHits(G4Step * aStep, G4TouchableHistory * ) {
   G4double edep = aStep->GetTotalEnergyDeposit();
-
-  if(edep == 0.) return false; // If there is no energy deposit, ignore the step
-  G4StepPoint * prePoint = aStep->GetPostStepPoint();
-  G4String name = aStep->GetTrack()->GetParticleDefinition()->GetParticleName();
+  G4StepPoint * postPoint = aStep->GetPostStepPoint();
+  G4StepPoint * prePoint = aStep->GetPreStepPoint();
   G4String procName = "unknow";
-  if(prePoint != NULL) {
+  G4String procPostName = "unknow";
+
+  if(prePoint != NULL && prePoint->GetProcessDefinedStep() != NULL) {
     procName = prePoint->GetProcessDefinedStep()->GetProcessName();
-    if(procName == "Decay" && name == "mu-") {
-      desCount += 1;
-    }
   }
+  if(postPoint != NULL && postPoint->GetProcessDefinedStep() != NULL) {
+    procPostName = postPoint->GetProcessDefinedStep()->GetProcessName();
+  }
+
+  if(edep == 0. && procName != "Decay" && procPostName != "Decay") {
+    return false;
+  }// If there is no energy deposit and this is not a decay, ignore the step
+  G4String name = aStep->GetTrack()->GetParticleDefinition()->GetParticleName();
 
   RaquetteHit * newHit = new RaquetteHit;
 
@@ -49,6 +54,10 @@ G4bool SensitiveDetector::ProcessHits(G4Step * aStep, G4TouchableHistory * ) {
   newHit->SetIsPrimary(aStep->GetTrack()->GetParentID() == 0);
   newHit->SetDetecteur(Detect::detecteur);
   newHit->SetProcName (procName);
+  if(procPostName == "Decay") {
+    newHit->SetProcName(procPostName);
+  }
+  newHit->SetDeltaTime(aStep->GetTrack()->GetGlobalTime());
 
   _hitsCollection->insert(newHit);
 

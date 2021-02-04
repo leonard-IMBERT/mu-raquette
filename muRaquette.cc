@@ -2,7 +2,7 @@
 
 // Enable multi-threading
 // == Run Manager
-#define G4MULTITHREADED = 1
+// #define G4MULTITHREADED = 1
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
 #else
@@ -15,6 +15,8 @@
 #include "G4UIExecutive.hh"
 // == Vis
 #include "G4VisExecutive.hh"
+// == Random
+#include "Randomize.hh"
 
 // Import detector code
 // == Construction
@@ -27,6 +29,7 @@
 #include "RootData.hh"
 // Import source
 #include "SourceReader.hh"
+//
 
 RootData * rootFile;
 SourceReader * source;
@@ -42,9 +45,14 @@ int main(int argc, char** argv) {
   // == Read source
   source = new SourceReader;
 
+  // == Set the seed
+  long seed = 23356131;
+  G4Random::setTheSeed(seed);
+
   // == Construct the run manager
-  G4MTRunManager * runManager = new G4MTRunManager;
-  runManager->SetNumberOfThreads(4);
+  //G4MTRunManager * runManager = new G4MTRunManager;
+  //runManager->SetNumberOfThreads(4);
+  G4RunManager * runManager = new G4RunManager;
 
   rootFile = new RootData();
   rootFile->Create();
@@ -88,7 +96,9 @@ int main(int argc, char** argv) {
   }
 
   // On quit, cleanup
+  G4cout << " === Done ! === " << G4endl;
   rootFile->EndOfAction();
+  G4cout << " === Results saved ! === " << G4endl;
   delete runManager;
   delete rootFile;
   delete source;

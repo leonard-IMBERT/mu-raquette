@@ -23,7 +23,8 @@ RootData::RootData() {
   hfile = (TFile *)0;
 }
 
-RootData::~RootData() {}
+RootData::~RootData() {
+}
 
 
 void RootData::Create() {
@@ -33,13 +34,35 @@ void RootData::Create() {
   EMuDetecteur = new TH1D("EMuDetecteur", "Energie deposee par les muons dans le detecteur;Energie (MeV);Nombre d'evenements", 300, 0, 65);
   EMuVetoA = new TH1D("EMuVetoA", "Energie deposee par les muons dans le veto A;Energie (MeV);Nombre d'evenements", 300, 0, 65);
   EMuVetoB = new TH1D("EMuVetoB", "Energie deposee par les muons dans le veto B;Energie (MeV);Nombre d'evenements", 300, 0, 65);
+  events = new TTree("event", "The event log of signals");
+  EmptyLog();
+  tDecay = false;
+  ELB = events->Branch("EventsLog", &eventsLog, "eventsLog[2000]/D");
+  TDB = events->Branch("TrueDecay", &tDecay, "trueDecay/O");
 }
 
-void RootData::FillTree(G4double MuEDep, G4String procName, Detect detect) {
+void RootData::FillHist(G4double MuEDep, G4String procName, Detect detect) {
   if(MuEDep > 0 && detect == Detect::vetoA) { EMuVetoA->Fill(MuEDep); };
   if(MuEDep > 0 && detect == Detect::vetoB) { EMuVetoB->Fill(MuEDep); };
   if(MuEDep > 0 && detect == Detect::detecteur) { EMuDetecteur->Fill(MuEDep); };
   if(MuEDep > 0 && detect == Detect::detecteur && procName == "Decay") { EDepByDes->Fill(MuEDep); };
+}
+
+
+G4double * RootData::GetLogs() {
+  return eventsLog;
+}
+
+void RootData::EmptyLog() {
+  for(int ii = 0; ii < 2000; ii ++) {
+    eventsLog[ii] = 0.;
+  }
+}
+
+void RootData::SaveLog() {
+  events->Fill();
+  EmptyLog();
+  tDecay = false;
 }
 
 void RootData::EndOfAction() {

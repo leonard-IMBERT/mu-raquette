@@ -6,12 +6,16 @@
 #include "G4SDManager.hh"
 #include "G4SystemOfUnits.hh"
 
+#include <math.h>
+#include <regex>
+
 extern RootData * rootFile;
 
 EventAction::EventAction() {
   detectID = -1;
   vetoAID = -1;
   vetoBID = -1;
+  manager = G4EventManager::GetEventManager();
 }
 
 EventAction::~EventAction() {;}
@@ -50,6 +54,8 @@ void EventAction::EndOfEventAction(const G4Event * evt) {
   G4String procName;
   Detect detecteur;
 
+  std::regex decay_Reg("Decay");
+
   //  ========== Detecteur ============
 
   if(HCE) { THC = (HitsCollection*)(HCE->GetHC(detectID)); }
@@ -57,6 +63,7 @@ void EventAction::EndOfEventAction(const G4Event * evt) {
   MuEDepD = 0.*MeV;
   procName = "";
   detecteur = Detect::other;
+  G4double lastSignalD = 0;
 
   if(THC) {
 
@@ -64,20 +71,23 @@ void EventAction::EndOfEventAction(const G4Event * evt) {
     for (G4int ii=0; ii < n_hit; ii++) { // For each hit
       G4double edep = (*THC)[ii]->GetEdep();
       G4String name = (*THC)[ii]->GetName();
-      if(name == "mu-" && edep > 0.) {
-        procName = (*THC)[ii]->GetProcName();
-        if(hasDecay == false && procName == "Decay") {
-          hasDecay = true;
-        }
-        detecteur = (*THC)[ii]->GetDetecteur();
-        MuEDepD += edep;
-      }
-    }
+      G4double dTime = (*THC)[ii]->GetDeltaTime();
+      detecteur = (*THC)[ii]->GetDetecteur();
+      procName = (*THC)[ii]->GetProcName();
 
+
+      if(edep > 0 && dTime > lastSignalD) {
+        lastSignalD = dTime;
+      }
+
+      if(hasDecay == false && std::regex_search(procName, decay_Reg) && name == "mu-") {
+        hasDecay = true;
+      }
+
+      MuEDepD += edep;
+    }
   }
-  // if (MuEDep != 0. || GEDep != 0.) {
-  rootFile->FillTree(MuEDepD, procName, detecteur);
-  // }
+  rootFile->FillHist(MuEDepD, procName, detecteur);
 
   //  ========== VetoA ============
 
@@ -86,23 +96,27 @@ void EventAction::EndOfEventAction(const G4Event * evt) {
   MuEDepVA = 0.*MeV;
   procName = "";
   detecteur = Detect::other;
+  G4double lastSignalVA = 0;
   if(THC) {
 
     int n_hit = THC->entries();
     for (G4int ii=0; ii < n_hit; ii++) { // For each hit
       G4double edep = (*THC)[ii]->GetEdep();
       G4String name = (*THC)[ii]->GetName();
+      G4double dTime = (*THC)[ii]->GetDeltaTime();
+      procName = (*THC)[ii]->GetProcName();
+      detecteur = (*THC)[ii]->GetDetecteur();
+
+      if(edep > 0 && dTime > lastSignalVA) {
+        lastSignalVA = dTime;
+      }
       if(name == "mu-" && edep > 0.) {
-        procName = (*THC)[ii]->GetProcName();
-        detecteur = (*THC)[ii]->GetDetecteur();
         MuEDepVA += edep;
       }
     }
 
   }
-  // if (MuEDepVA != 0. || GEDep != 0.) {
-  rootFile->FillTree(MuEDepVA, procName, detecteur);
-  // }
+  rootFile->FillHist(MuEDepVA, procName, detecteur);
 
   //  ========== VetoB ============
 
@@ -114,22 +128,44 @@ void EventAction::EndOfEventAction(const G4Event * evt) {
   if(THC) {
 
     int n_hit = THC->entries();
-    //G4cout << "     " << n_hit << " hits are stored in the collections." << G4endl;
     for (G4int ii=0; ii < n_hit; ii++) { // For each hit
       G4double edep = (*THC)[ii]->GetEdep();
       G4String name = (*THC)[ii]->GetName();
+      procName = (*THC)[ii]->GetProcName();
+      detecteur = (*THC)[ii]->GetDetecteur();
+
       if(name == "mu-" && edep > 0.) {
-        procName = (*THC)[ii]->GetProcName();
-        detecteur = (*THC)[ii]->GetDetecteur();
         MuEDepVB += edep;
       }
     }
 
   }
-  // if (MuEDepVB != 0. || GEDep != 0.) {
-  rootFile->FillTree(MuEDepVB, procName, detecteur);
-  // }
-  if(MuEDepD > 0. && MuEDepVA > 0. && MuEDepVB == 0) {
-    // G4cout << "Veto trigered, true decay ? : " << hasDecay << G4endl;
+  rootFile->FillHist(MuEDepVB, procName, detecteur);
+
+  // ========== Detection of decay ===============
+
+  if(MuEDepD > 0. && MuEDepVA > 0. && MuEDepVB == 0 && lastSignalD > lastSignalVA) {
+    if(HCE) { THC = (HitsCollection*)(HCE->GetHC(detectID)); }
+    if(hasDecay == false) {
+      manager->KeepTheCurrentEvent();
+    }
+    //G4cout << "Veto trigered, true decay ? : " << hasDecay << G4endl;
+    if(THC) {
+      int n_hit = THC->entries();
+      rootFile->tDecay = hasDecay;
+      for (G4int ii=0; ii < n_hit; ii++) { // For each hit
+        auto entry = (*THC)[ii];
+
+        G4int time = floor(entry->GetDeltaTime() * ns / 10);
+        if (time >= 2000) {
+          G4cout << time << G4endl;
+        }
+        if (time < 2000 && time >= 0) {
+          (rootFile->GetLogs())[time] += entry->GetEdep();
+        }
+      }
+
+      rootFile->SaveLog();
+    }
   }
 }

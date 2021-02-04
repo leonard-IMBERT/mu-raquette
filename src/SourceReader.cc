@@ -16,6 +16,8 @@
 #include "TFile.h"
 #include "G4ios.hh"
 
+#include <math.h>
+
 SourceReader::SourceReader() {
   #ifdef G4MULTITHREADED
   int n_threads = 4;
@@ -33,8 +35,9 @@ SourceReader::~SourceReader() {
 }
 
 G4double SourceReader::GetRandomMuE() {
+  double nTot = 6000000.;
   nRead += 1;
-  G4cout << "Nombre d'evenement ecrits: " << nRead << G4endl;
+  G4cout << "\rNombre d'evenement produits: " << floor((((double) nRead)/nTot) * 100.) << " % (" << nRead << ")";
   G4double ret = distE->GetRandom();
   return ret;
 }

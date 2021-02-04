@@ -30,6 +30,7 @@ class RaquetteHit : public G4VHit {
     void SetIsPrimary(G4bool prim)       { _isPrimary = prim; };
     void SetDetecteur(Detect de)         { _detecteur = de; };
     void SetProcName (G4String procName) { _procName = procName; };
+    void SetDeltaTime(G4double dtime)    { _dTime = dtime; };
 
     // Getters
     G4int         GetTrackID  () { return _trackId; };
@@ -41,6 +42,7 @@ class RaquetteHit : public G4VHit {
     G4bool        GetIsPrimary() { return _isPrimary; };
     Detect        GetDetecteur() { return _detecteur; };
     G4String      GetProcName () { return _procName; };
+    G4double      GetDeltaTime() { return _dTime; };
 
   private:
     G4int         _trackId;    // Id of the track
@@ -52,6 +54,7 @@ class RaquetteHit : public G4VHit {
     G4bool        _isPrimary;
     Detect        _detecteur;  // Detecteur
     G4String      _procName;
+    G4double      _dTime;
 };
 
 typedef G4THitsCollection<RaquetteHit> HitsCollection;
