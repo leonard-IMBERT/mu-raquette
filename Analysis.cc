@@ -1,5 +1,5 @@
 void Analysis() {
-  TFile * file = new TFile("build/Results.root");
+  TFile * file = new TFile("build/Results6.root");
 
 
   TH1D * EDepByDes = file->Get<TH1D>("EDepByDes");
@@ -7,29 +7,76 @@ void Analysis() {
   TH1D * EMuVetoA = file->Get<TH1D>("EMuVetoA");
   TH1D * EMuVetoB = file->Get<TH1D>("EMuVetoB");
 
+  TH1D * FalsePositive = new TH1D("Faux positif (exemple)", "Faux positif (exemple); Temps(micro s); Energie (MeV)", 2000, 0, 20);
+  TH1D * Signal = new TH1D("Temps de desintegration", "Temps de desintegration; Temps de desintegration(micro s); Nombre d'evenements", 2000, 0, 20);
+  
+  event Signals;
+
+  int nS = Signals.Loop();
+  int NFP = 0;
+  int NTD = 0;
+  int NRejected = 0;
 
 
-  TCanvas * canvas = new TCanvas("EDepByDes", "Energy deposited  desintegration", 800, 600);
-  gPad = canvas;
-  EDepByDes->Draw();
-  canvas->Draw();
-  canvas->Print("images/EDepByDes.png", "png");
+  bool aFP = false;
+  bool aTD = false;
+  for(int ii = 0; ii < nS; ii ++) {
+    Signals.GetEntry(ii);
+    if(Signals.TrueDecay == false && aFP == false) {
+      NFP += 1;
+      //std::cout << "FP" << std::endl;
+      //aFP = true;
+      for(int yy = 0; yy < 2000; yy++) {
+        if(Signals.EventsLog[yy] > 0) {
+          FalsePositive->AddBinContent(yy+1, Signals.EventsLog[yy]);
+        }
+      }
+    }
+    //if(Signals.TrueDecay == true && aTD == false) {
+      //std::cout << "TD" << std::endl;
+      /* aTD = true;
+      for(int yy = 0; yy < 200; yy++) {
+        Signal->AddBinContent(yy + 1, Signals.EventsLog[yy]);
+        std::cout << Signals.EventsLog[yy] << std::endl;
+      } */
+    if(Signals.TrueDecay == true) {
+      NTD += 1;
+      int start = -1;
+      int nothing = false;
+      int stop = -2;
+      for(int yy = 0; yy < 2000; yy++) {
+        if(Signals.EventsLog[yy] > 0 && start < 0 && stop < 0 && nothing == false) {
+          start = yy;
+        }
+        if(Signals.EventsLog[yy] == 0 && start >= 0 && stop < 0 && nothing == false) {
+          nothing = true;
+        }
+        if(Signals.EventsLog[yy] > 0 && start >= 0 && stop < 0 && nothing == true) {
+          stop = yy;
+        }
+      }
+      if (stop - start >= 0) {
+        double t = ((double)(stop - start)) * 0.01;
+        Signal->Fill(t);
+      } else {
+        NRejected += 1;
+      }
+      std::cout << "\r Nombre d'évenements traités: " << ii;
+    }
+  }
 
-  TCanvas * canvasMuDect = new TCanvas("EMuDetecteur", "Energy deposited bu mu- in detector", 800, 600);
-  gPad = canvasMuDect;
-  EMuDetecteur->Draw();
-  canvasMuDect->Draw();
-  canvasMuDect->Print("images/EMuDetecteur.png", "png");
+  std::cout << "Nombre d'entrée : " << nS << std::endl;
+  std::cout << "Nombre de faux positifs : " << NFP << std::endl;
+  std::cout << "Nombre de vrai signaux : " << NTD << std::endl;
+  std::cout << "Nombre de vrai signaux rejetés : " << NRejected << std::endl;
+    
+  TCanvas * canvasFB = new TCanvas("FP", "Faux positif", 800, 600);
+  gPad = canvasFB;
+  FalsePositive->Draw();
+  canvasFB->Draw();
 
-  TCanvas * canvasMuVA = new TCanvas("EMuVetoA", "Energy deposited bu mu- in VetoA", 800, 600);
-  gPad = canvasMuVA;
-  EMuVetoA->Draw();
-  canvasMuVA->Draw();
-  canvasMuVA->Print("images/EMuVetoA.png", "png");
-
-  TCanvas * canvasMuVB = new TCanvas("EMuVetoB", "Energy deposited bu mu- in VetoB", 800, 600);
-  gPad = canvasMuVB;
-  EMuVetoB->Draw();
-  canvasMuVB->Print("images/EMuVetoB.png", "png");
-  canvasMuVB->Draw();
+  TCanvas * canvasTD = new TCanvas("TD", "Desintegration", 800, 600);
+  gPad = canvasTD;
+  Signal->Draw();
+  canvasTD->Draw();
 }
