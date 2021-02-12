@@ -25,6 +25,7 @@ DetectorConstruction::~DetectorConstruction() {}
 
 void DetectorConstruction::ConstructSDandField() {
   // ====== Sensible volume ======
+  /* For Experimental team : the vetoA is called D1, the vetoB is called D3 and the detector is called D2 */
   G4String sensitiveName = "RaquetteSD";
   SensitiveDetector * sd = new SensitiveDetector(sensitiveName, RaquetteCollectionName);
   G4String vetoAName = "VetoASD";
@@ -44,8 +45,8 @@ G4VPhysicalVolume * DetectorConstruction::Construct() {
 
   G4double a;  // atomic mass
   G4double z;  // atomic number
-  G4double density;
-  G4int nel;
+  G4double density; // density of the material
+  G4int nel; // number of element in one material
 
   // Air
   G4Element * N = new G4Element("Nitrogen", "N", z=7., a= 14.01*g/mole);
@@ -55,7 +56,7 @@ G4VPhysicalVolume * DetectorConstruction::Construct() {
   Air->AddElement(N, 70*perCent);
   Air->AddElement(O, 30*perCent);
 
-  // C9H10
+  // C9H10 (organic scintillator(plastic))
   G4Element * C = new G4Element("Carbon", "C", z=6., a= 12.00*g/mole);
   G4Element * H = new G4Element("Hydrogen", "H", z =1., a= 1.0079*g/mole);
 
@@ -73,11 +74,21 @@ G4VPhysicalVolume * DetectorConstruction::Construct() {
   experimentalHall_log         = new G4LogicalVolume(experimentalHall_box, Air, "expHall_log");
   //                                 G4PVPlacement(rot, translate, logicalVolume, name, mother volume, many ?, nCopy)
   experimentalHall_phys        = new G4PVPlacement(0, G4ThreeVector(), experimentalHall_log, "expHall", 0, false, 0);
+/* Detector diagram :
 
+________  _____ ________
+‡Ò∂ƒﬁÌÏÈ¬µæê®†ÚºîÈ¬µæê®†Úºîπë“‘
+
+
+
+
+
+
+*/
   // === Raquette
   // Z -> height axis
-  // ======== Raquette 1
-  // =========== Square 1
+  // ======== Raquette 1 (definition of the physical volume of the vetoA)
+  // =========== Square 1 (surface superior to the z axis)
   G4double rs_z = (3./2.)*cm;
   G4double rs_x = (47.5/2.)*cm;
   G4double rs_y = (49./2.)*cm;
