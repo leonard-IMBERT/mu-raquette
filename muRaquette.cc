@@ -46,8 +46,8 @@ int main(int argc, char** argv) {
   source = new SourceReader;
 
   // == Set the seed
-  long seed = 23356131;
-  G4Random::setTheSeed(seed);
+  // long seed = 23356131;
+  // G4Random::setTheSeed(seed);
 
   // == Construct the run manager
   //G4MTRunManager * runManager = new G4MTRunManager;
@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
   runManager->SetUserInitialization(init);
   runManager->Initialize();
 
-  G4cout << "run manager setup done" << G4endl;
+  // G4cout << "run manager setup done" << G4endl;
 
   // == Initialize Vis
   G4VisManager* visManager = new G4VisExecutive;
@@ -96,9 +96,9 @@ int main(int argc, char** argv) {
   }
 
   // On quit, cleanup
-  G4cout << " === Done ! === " << G4endl;
+  // G4cout << " === Done ! === " << G4endl;
   rootFile->EndOfAction();
-  G4cout << " === Results saved ! === " << G4endl;
+  // G4cout << " === Results saved ! === " << G4endl;
   delete runManager;
   delete rootFile;
   delete source;

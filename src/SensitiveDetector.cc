@@ -54,6 +54,8 @@ G4bool SensitiveDetector::ProcessHits(G4Step * aStep, G4TouchableHistory * ) {
   newHit->SetIsPrimary(aStep->GetTrack()->GetParentID() == 0);
   newHit->SetDetecteur(Detect::detecteur);
   newHit->SetProcName (procName);
+
+  // If one of the two step (previous or next) is a decay, flag the hit as a decay
   if(procPostName == "Decay") {
     newHit->SetProcName(procPostName);
   }
