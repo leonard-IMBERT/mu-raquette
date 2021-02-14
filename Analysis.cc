@@ -8,7 +8,7 @@ void Analysis() {
   TH1D * EMuVetoB = file->Get<TH1D>("EMuVetoB");
 
   TH1D * FalsePositive = new TH1D("Faux positif (exemple)", "Faux positif (exemple); Temps(micro s); Energie (MeV)", 2000, 0, 20);
-  TH1D * Signal = new TH1D("Temps de desintegration", "Temps de desintegration; Temps de desintegration(micro s); Nombre d'evenements", 2000, 0, 20);
+  TH1D * Signal = new TH1D("Temps de desintegration", "Time between two signal (simulation); Time (micro s); Number of events", 200, 0, 20);
   
   event Signals;
 
@@ -77,6 +77,8 @@ void Analysis() {
 
   TCanvas * canvasTD = new TCanvas("TD", "Desintegration", 800, 600);
   gPad = canvasTD;
-  Signal->Draw();
+  gStyle->SetOptFit(0111);
+  Signal->Draw("e");
+  Signal->Fit("expo", "e", "", 0.1, 19.9);
   canvasTD->Draw();
 }
